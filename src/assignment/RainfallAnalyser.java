@@ -10,9 +10,10 @@ import java.util.Scanner;
 public class RainfallAnalyser {
     /**
      * Author:Tirivashe Ushamba
-     * Version: 1.0
-     * Date:11-11-2022
-     * Description:
+     * Version: Alpha release
+     * Date:27-11-2022
+     * Description:This Program will analyse the given data files to produce the year,month,total Ranafall , mininmum
+     * Rainfall and the maximum rainfall from the given file .
      */
     // define constants
     private static final String OUTPUT_HEADER = "year,month,total,min,max";
@@ -50,10 +51,10 @@ public class RainfallAnalyser {
         int year;
         byte currentMonth ;
         byte previousMonth = 1;
-        float rainAmong;
+        double rainAmong;
         double totalMonthlyRainfall = 0.0;
-        double min = Double.NEGATIVE_INFINITY;
-        double max = Double.POSITIVE_INFINITY;
+        double min = Double.POSITIVE_INFINITY;
+        double max = Double.NEGATIVE_INFINITY;
 
 
         try{
@@ -86,43 +87,42 @@ public class RainfallAnalyser {
         }
 
 
-        while (!TextIO.eof()) {
+        while (!TextIO.eof()){
+
             //and read again
             line = TextIO.getln().trim();
 
-            //extract info ....
+            //extract info...
             newFile = line.split(",");
 
-            // Set value 0 for empty strings in the file
-            String[] newData = Arrays.copyOf(newFile, checkColumn);
+            //add miss data to 0
+            String[] newRecord = Arrays.copyOf(newFile, checkColumn);
             for (int i = 0; i < checkColumn; i++){
-                if(newData[i] == null || newData[i].equals("")){
-                    newData[i] = "0";
+                if(newRecord[i] == null || newRecord[i].equals("")){
+                    newRecord[i] = "0";
                 }
             }
-            newFile = newData;
+            newFile = newRecord;
 
-
-
-            //extract year, month, day, rainfall from records
+            //update year, month, rain among
             year = Integer.parseInt(newFile[2]);
-            currentMonth = (byte) Integer.parseInt(newFile[3]);
-            rainAmong = Integer.parseInt(newFile[5]);
+            currentMonth = Byte.parseByte(newFile[3]);
+            rainAmong = Double.parseDouble(newFile[5]);
 
-
-
-            // verify that you are in a new month
-            // then save the information to the output file
-
-            /** otherwise update total monthlyrainfall, min and max**/
+            //add rain among to total rain among
             totalMonthlyRainfall += rainAmong;
+
+            //check min rain among
             if (rainAmong < min) {
                 min = rainAmong;
             }
+
+            //check max rain among
             if (rainAmong > max) {
                 max = rainAmong;
             }
 
+            //save each month data and reset max, min
             if (currentMonth != previousMonth){
                 saveMonthlyRecord(year, previousMonth, max, min, totalMonthlyRainfall);
 
@@ -140,7 +140,6 @@ public class RainfallAnalyser {
                     max = rainAmong;
                 }
             }
-
         }
     }
 
