@@ -28,21 +28,10 @@ public class RainfallVisualiser extends Application {
      * Description: The Program will show bar chat summarizing mothly rainfall from the rainfall analysis program .
      * The user should enter the name and path of the file to be shown on the bar chat
      */
-    //------ End of Implementation details ------
     static final double margin = 50;
     final static Integer rotationVertical = 90;
     public void drawPicture(GraphicsContext g, int width, int height, String filePath) {
 
-
-        // draw a rectangle
-        //g.setFill(Color.YELLOWGREEN);
-        //g.fillRect(100, 100, 200, 100);
-
-        // draw an oval
-        //g.fillOval(400, 400, 100, 100); // a circle
-        //g.setStroke(Color.BLACK);
-        //g.strokeOval(400, 400, 100, 100);
-        //getFIleName();
 
 
         //String filePath = getFIleName();
@@ -69,7 +58,7 @@ public class RainfallVisualiser extends Application {
         int numOfRecords = (int) getNumOfRecords(filePath);
         int numOfRows = (int)(yAxisLength/margin);
         int ratioOfVertivalLines = (int)(maxMonthlyRainfall/yAxisLength) +1;
-        ;
+
 
         //testing: draw a bar with monthlyRainfall 702.40
         double barHeight = maxMonthlyRainfall* yAxisLength + 1;
@@ -85,7 +74,7 @@ public class RainfallVisualiser extends Application {
         TextIO.readFile(filePath);
         String line = getln();
         System.out.println(line);
-        int asd = 0;
+        double barColor = 360 * Math.random();
         /**
  * Drawing the vertical and horizontal grid lines to read the bar chat easily
  */
@@ -96,6 +85,7 @@ public class RainfallVisualiser extends Application {
          * File name in the bar chat
          * Horizontal label showing the months
          * Vertical label name
+         *
          */
         titleLabel(g, filePath, width);
         verticalUnitLabel(g, height);
@@ -106,7 +96,7 @@ public class RainfallVisualiser extends Application {
         while (!TextIO.eof()){
 
 
-            asd++;
+            barColor++;
             //set fill color alternately: red - blue - red -blue ...
             //get a record\
             line = getln().trim();
@@ -117,12 +107,7 @@ public class RainfallVisualiser extends Application {
             barHeight = (monthlyTotal/maxMonthlyRainfall)* yAxisLength;
             currentPointY = originPoint.getY()- barHeight;
             //draw a rectangle: fillRect
-            if (asd%2 == 0){
-                g.setFill(Color.RED);
-
-            } else {
-                g.setFill(Color.GREEN);
-            }
+            g.setFill(Color.hsb(barColor, 4.0, 1.0));
             g.fillRect(currentPointX,currentPointY,barWidth,barHeight);
             // continue to the next point
             currentPointX += barWidth;
@@ -131,21 +116,21 @@ public class RainfallVisualiser extends Application {
     } // end drawPicture()
 
     private String getFIleName() {
-        System.out.println("Enter a filename: ");
+        System.out.print("Enter a filename: " );
         return getln();
     }
 
-    private void horizontalLabel(GraphicsContext g, int height,String FILE_PATH ,double barWidth) {
+    private void horizontalLabel(GraphicsContext g, int height,String filePath ,double barWidth) {
         String previousYear = null;
         String currentYear;
         double gapBetweenLabel = 0;
 
         gapBetweenLabel += margin;
 
-        g.setFont(Font.font("Times New Roman",8));
+        g.setFont(Font.font("Times New Roman",5));
 
         //read file and ignore first line
-        TextIO.readFile(FILE_PATH);
+        TextIO.readFile(filePath);
         getln();
 
         while (!TextIO.eof()){
@@ -260,7 +245,6 @@ public class RainfallVisualiser extends Application {
     }
 
 
-    //------ Implementation details: DO NOT EDIT THIS ------
     @Override
     public void start(Stage stage) {
         int width = 218 * 6 + 40;
