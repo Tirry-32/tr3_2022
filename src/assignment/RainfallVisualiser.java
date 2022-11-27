@@ -51,7 +51,7 @@ public class RainfallVisualiser extends Application {
 
         // TODO: draw the monthly totals as a bar chart
 
-        double xAxisLength = width - 4.0 * margin;
+        double xAxisLength = width - 2.0 * margin;
         double yAxisLength = height - 4.0 * margin;
         double barWidth = xAxisLength / getNumOfRecords(filePath);
         double currentPointX = originPoint.getX();
@@ -62,7 +62,7 @@ public class RainfallVisualiser extends Application {
 
         //testing: draw a bar with monthlyRainfall 702.40
         double barHeight = maxMonthlyRainfall* yAxisLength + 1;
-        currentPointX += 30 * barWidth;
+        currentPointX += 0.0125 * barWidth;
         double currentPointY = originPoint.getY() - barHeight;
         g.setFill(Color.RED);
 
@@ -107,7 +107,7 @@ public class RainfallVisualiser extends Application {
             barHeight = (monthlyTotal/maxMonthlyRainfall)* yAxisLength;
             currentPointY = originPoint.getY()- barHeight;
             //draw a rectangle: fillRect
-            g.setFill(Color.hsb(barColor, 4.0, 1.0));
+            g.setFill(Color.hsb(barColor, 1.0, 1.0));
             g.fillRect(currentPointX,currentPointY,barWidth,barHeight);
             // continue to the next point
             currentPointX += barWidth;
@@ -127,7 +127,7 @@ public class RainfallVisualiser extends Application {
 
         gapBetweenLabel += margin;
 
-        g.setFont(Font.font("Times New Roman",5));
+        g.setFont(Font.font("calibre",9));
 
         //read file and ignore first line
         TextIO.readFile(filePath);
@@ -161,7 +161,7 @@ public class RainfallVisualiser extends Application {
         String[] fileName;
         String barGraphName = FILE_PATH;
 
-        g.setFont(Font.font("Times New Roman",14));
+        g.setFont(Font.font("calibre",18));
 
         //Classified only file name
         if(barGraphName.contains("/")){
@@ -212,8 +212,8 @@ public class RainfallVisualiser extends Application {
     }
 
 
-    double getMaxMonthlyRainfall(String FILE_PATH){
-        TextIO.readFile(FILE_PATH);
+    double getMaxMonthlyRainfall(String filePath){
+        TextIO.readFile(filePath);
         //read the first line and ignore
         String line = getln();
 
@@ -227,8 +227,8 @@ public class RainfallVisualiser extends Application {
         return maxMonthlyRainfall;
     }
 
-    long getNumOfRecords(String FILE_PATH){
-        TextIO.readFile(FILE_PATH);
+    long getNumOfRecords(String filePath){
+        TextIO.readFile(filePath);
         getln();
         int numOfRecords = 0;
         while (!TextIO.eof()){
