@@ -8,9 +8,12 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import textio.TextIO;
+
+import static textio.TextIO.getln;
 
 
 public class RainfallVisualiser extends Application {
@@ -22,13 +25,13 @@ public class RainfallVisualiser extends Application {
      *
      * Author : Tirivashe Ushamba
      * Version: 1.0
-     * Description:....
+     * Description: The Program will show bar chat summarizing mothly rainfall from the rainfall analysis program .
+     * The user should enter the name and path of the file to be shown on the bar chat
      */
     //------ End of Implementation details ------
-    final String FILE_PATH = "resources/sample_analysed.csv";
-    static final double margin = 20;
+    static final double margin = 50;
     final static Integer rotationVertical = 90;
-    public void drawPicture(GraphicsContext g, int width, int height) {
+    public void drawPicture(GraphicsContext g, int width, int height, String filePath) {
 
 
         // draw a rectangle
@@ -39,8 +42,11 @@ public class RainfallVisualiser extends Application {
         //g.fillOval(400, 400, 100, 100); // a circle
         //g.setStroke(Color.BLACK);
         //g.strokeOval(400, 400, 100, 100);
+        //getFIleName();
 
-        double maxMonthlyRainfall = getMaxMonthlyRainfall(FILE_PATH);
+
+        //String filePath = getFIleName();
+        double maxMonthlyRainfall = getMaxMonthlyRainfall(filePath);
         System.out.println("Max = " + maxMonthlyRainfall);
 
         // TODO: draw the x-axis and y-axis
@@ -48,19 +54,19 @@ public class RainfallVisualiser extends Application {
 
         // draw y-axis
         g.setStroke(Color.BLACK);
-        g.setLineWidth(1);
+        g.setLineWidth(0.4);
         g.strokeLine(originPoint.getX(), margin,
                 originPoint.getX(), originPoint.getY());
         // draw x-axis
-        g.strokeLine(originPoint.getX(), originPoint.getY(), width - margin, originPoint.getY());
+        g.strokeLine( originPoint.getX(), originPoint.getY(), width - margin, originPoint.getY());
 
         // TODO: draw the monthly totals as a bar chart
 
-        double xAxisLength = width - 2.0 * margin;
-        double yAxisLength = height - 2.0 * margin;
-        double barWidth = xAxisLength / getNumOfRecords(FILE_PATH);
+        double xAxisLength = width - 4.0 * margin;
+        double yAxisLength = height - 4.0 * margin;
+        double barWidth = xAxisLength / getNumOfRecords(filePath);
         double currentPointX = originPoint.getX();
-        int numOfRecords = (int) getNumOfRecords(FILE_PATH);
+        int numOfRecords = (int) getNumOfRecords(filePath);
         int numOfRows = (int)(yAxisLength/margin);
         int ratioOfVertivalLines = (int)(maxMonthlyRainfall/yAxisLength) +1;
         ;
@@ -76,20 +82,35 @@ public class RainfallVisualiser extends Application {
         // set the starting point X-value
 
         //read and ignore the first line
-        TextIO.readFile(FILE_PATH);
-        String line = TextIO.getln();
+        TextIO.readFile(filePath);
+        String line = getln();
         System.out.println(line);
         int asd = 0;
-
+        /**
+ * Drawing the vertical and horizontal grid lines to read the bar chat easily
+ */
         verticalline(g,height , barWidth, numOfRecords);
         horizontalLine(g, width, ratioOfVertivalLines, height, numOfRows);
+
+        /**
+         * File name in the bar chat
+         * Horizontal label showing the months
+         * Vertical label name
+         */
+        titleLabel(g, filePath, width);
+        verticalUnitLabel(g, height);
+        horizontalUnitLabel(g, width, height);
+
+
+
         while (!TextIO.eof()){
-            TextIO.getln();
+
 
             asd++;
             //set fill color alternately: red - blue - red -blue ...
-            //get a record
-            String[] record = TextIO.getln().trim().split(",");
+            //get a record\
+            line = getln().trim();
+            String[] record = line.split(",");
             //get monthly total
             double monthlyTotal = Double.parseDouble(record[2]);
             // get barHeight/ Hint: need to scale down with YAxisHeight and maxMonthlyTotal (?)
@@ -106,7 +127,86 @@ public class RainfallVisualiser extends Application {
             // continue to the next point
             currentPointX += barWidth;
         }
+        horizontalLabel(g, height, filePath, barWidth);
     } // end drawPicture()
+
+    private String getFIleName() {
+        System.out.println("Enter a filename: ");
+        return getln();
+    }
+
+    private void horizontalLabel(GraphicsContext g, int height,String FILE_PATH ,double barWidth) {
+        String previousYear = null;
+        String currentYear;
+        double gapBetweenLabel = 0;
+
+        gapBetweenLabel += margin;
+
+        g.setFont(Font.font("Times New Roman",8));
+
+        //read file and ignore first line
+        TextIO.readFile(FILE_PATH);
+        getln();
+
+        while (!TextIO.eof()){
+
+            //and read again
+            String line = getln().trim();
+
+            //extract info...
+            String[] record = line.split(",");
+
+            currentYear = record[0];
+
+            //draw X axis label (YY/01)
+            if (!currentYear.equals(previousYear)) {
+                String yearAndMonth = record[0] + "." + record[1];
+                g.setTextAlign(TextAlignment.CENTER);
+                g.setTextBaseline(VPos.TOP);
+                g.setFill(Color.BLACK);
+                g.fillText(yearAndMonth, gapBetweenLabel, height - margin);
+            }
+            previousYear = currentYear;
+
+            gapBetweenLabel += barWidth;
+        }
+    }
+
+    private void titleLabel(GraphicsContext g, String FILE_PATH, int width) {
+        String[] fileName;
+        String barGraphName = FILE_PATH;
+
+        g.setFont(Font.font("Times New Roman",14));
+
+        //Classified only file name
+        if(barGraphName.contains("/")){
+            fileName = FILE_PATH.split("/");
+            barGraphName = fileName[1];
+        }
+        if(barGraphName.contains("_")){
+            fileName = barGraphName.split("_");
+            barGraphName = fileName[0];
+        }
+
+        //draw title label
+        g.fillText(barGraphName, (double) width/2, (double) margin/4);
+    }
+
+    private void horizontalUnitLabel(GraphicsContext g, int width, int height) {
+        g.setFont(Font.font("Calibre",20));
+
+        //x axis unit label
+        g.fillText(" Unit : Year.Month", (double) width/2, height- (double) (margin/1.2));
+    }
+
+    private void verticalUnitLabel(GraphicsContext g, int height) {
+        g.setFont(Font.font("Calibre",15));
+
+        // y axis unit label
+        g.rotate(rotationVertical);
+        g.fillText("Unit : millimeter(mm)", (double) height/2, (double)-margin/2);
+        g.rotate(-rotationVertical);
+    }
 
     private void horizontalLine(GraphicsContext g, int width, int ratioOfY, int height, int numOfRows) {
         //draw horizontal line
@@ -127,14 +227,14 @@ public class RainfallVisualiser extends Application {
     }
 
 
-    double getMaxMonthlyRainfall(String filePath){
-        TextIO.readFile(filePath);
+    double getMaxMonthlyRainfall(String FILE_PATH){
+        TextIO.readFile(FILE_PATH);
         //read the first line and ignore
-        String line = TextIO.getln();
+        String line = getln();
 
         double maxMonthlyRainfall = 0.0;
         while (!TextIO.eof()){
-            String[] record = TextIO.getln().trim().split(",");
+            String[] record = getln().trim().split(",");
             if (maxMonthlyRainfall < Double.parseDouble(record[2])){
                 maxMonthlyRainfall = Double.parseDouble(record[2]);
             }
@@ -142,12 +242,12 @@ public class RainfallVisualiser extends Application {
         return maxMonthlyRainfall;
     }
 
-    long getNumOfRecords(String filePath){
+    long getNumOfRecords(String FILE_PATH){
         TextIO.readFile(FILE_PATH);
-        TextIO.getln();
+        getln();
         int numOfRecords = 0;
         while (!TextIO.eof()){
-            TextIO.getln();
+            getln();
             numOfRecords++;
         }
         return numOfRecords;
@@ -166,7 +266,8 @@ public class RainfallVisualiser extends Application {
         int width = 218 * 6 + 40;
         int height = 500;
         Canvas canvas = new Canvas(width, height);
-        drawPicture(canvas.getGraphicsContext2D(), width, height);
+        String filePath = getFIleName();
+        drawPicture(canvas.getGraphicsContext2D(), width, height,filePath);
         BorderPane root = new BorderPane(canvas);
         root.setStyle("-fx-border-width: 4px; -fx-border-color: #444");
         Scene scene = new Scene(root);
