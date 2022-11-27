@@ -2,11 +2,13 @@ package assignment;
 
 import javafx.application.Application;
 import javafx.geometry.Point2D;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import textio.TextIO;
 
@@ -25,6 +27,7 @@ public class RainfallVisualiser extends Application {
     //------ End of Implementation details ------
     final String FILE_PATH = "resources/sample_analysed.csv";
     static final double margin = 20;
+    final static Integer rotationVertical = 90;
     public void drawPicture(GraphicsContext g, int width, int height) {
 
 
@@ -52,11 +55,14 @@ public class RainfallVisualiser extends Application {
         g.strokeLine(originPoint.getX(), originPoint.getY(), width - margin, originPoint.getY());
 
         // TODO: draw the monthly totals as a bar chart
+
         double xAxisLength = width - 2.0 * margin;
         double yAxisLength = height - 2.0 * margin;
         double barWidth = xAxisLength / getNumOfRecords(FILE_PATH);
         double currentPointX = originPoint.getX();
         int numOfRecords = (int) getNumOfRecords(FILE_PATH);
+        int numOfRows = (int)(yAxisLength/margin);
+        int ratioOfVertivalLines = (int)(maxMonthlyRainfall/yAxisLength) +1;
         ;
 
         //testing: draw a bar with monthlyRainfall 702.40
@@ -76,7 +82,7 @@ public class RainfallVisualiser extends Application {
         int asd = 0;
 
         verticalline(g,height , barWidth, numOfRecords);
-
+        horizontalLine(g, width, ratioOfVertivalLines, height, numOfRows);
         while (!TextIO.eof()){
             TextIO.getln();
 
@@ -101,6 +107,24 @@ public class RainfallVisualiser extends Application {
             currentPointX += barWidth;
         }
     } // end drawPicture()
+
+    private void horizontalLine(GraphicsContext g, int width, int ratioOfY, int height, int numOfRows) {
+        //draw horizontal line
+        for(int i = 0; i < numOfRows+1; i++){
+
+            g.strokeLine(margin, margin + (margin*i), width-margin, margin + (margin*i));
+            g.setTextAlign(TextAlignment.CENTER);
+            g.setTextBaseline(VPos.TOP);
+
+            // draw Y axis label
+            String count = Integer.toString((int) (margin * i * ratioOfY));
+            if(i > 0){
+                g.rotate(rotationVertical);
+                g.fillText(count, height - margin - (margin*i), -margin);
+                g.rotate(-rotationVertical);
+            }
+        }
+    }
 
 
     double getMaxMonthlyRainfall(String filePath){
@@ -134,6 +158,8 @@ public class RainfallVisualiser extends Application {
             g.strokeLine(margin+(barWidth*i), margin,margin+(barWidth*i),height-margin);
         }
     }
+
+
     //------ Implementation details: DO NOT EDIT THIS ------
     @Override
     public void start(Stage stage) {
