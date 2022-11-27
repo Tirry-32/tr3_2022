@@ -18,10 +18,6 @@ import static textio.TextIO.getln;
 
 public class RainfallVisualiser extends Application {
     /**
-     * Draws a picture.  The parameters width and height give the size
-     * of the drawing area, in pixels.
-     */
-    /**
      *
      * Author : Tirivashe Ushamba
      * Version: 1.0
@@ -75,9 +71,7 @@ public class RainfallVisualiser extends Application {
         String line = getln();
         System.out.println(line);
         double barColor = 360 * Math.random();
-        /**
- * Drawing the vertical and horizontal grid lines to read the bar chat easily
- */
+
         verticalline(g,height , barWidth, numOfRecords);
         horizontalLine(g, width, ratioOfVertivalLines, height, numOfRows);
 
